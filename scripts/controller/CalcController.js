@@ -13,10 +13,18 @@
     initialize(){
 
         setInterval(()=>{
-            this.Date = this.currentDate.toLocaleDateString(this._locale);
-            this.Time = this.currentDate.toLocaleTimeString(this._locale);
-        }, 1000)
+            this.setDisplayDateTime();
+        }, 1000);
 
+    }
+
+    setDisplayDateTime(){
+        this.Date = this.currentDate.toLocaleDateString(this._locale,{
+            day:'2-digit',
+            month:'long',
+            year:'numeric'
+        });
+        this.Time = this.currentDate.toLocaleTimeString(this._locale);
     }
 
     //Métodos DisplayTime
