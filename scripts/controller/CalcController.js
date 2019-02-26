@@ -16,6 +16,8 @@
         setInterval(()=>{
             this.setDisplayDateTime();       
         },1000);
+
+        this.setLastNumberToDisplay();
     }
 
     setDisplayDateTime(){
@@ -94,7 +96,7 @@
                 break;
 
             case 'igual':
-                
+                this.calc()
                 break;
 
             case 'ponto':
@@ -107,83 +109,102 @@
         }
     }
 
-    addOperation(value){
-      
-        if(isNaN(this.getLastOperation())){
-
-            if(this.isOperator(value)){
-
-                this.setLastOperation(value);
-                
-                }else if(isNaN(value)){
-                    console.log(value)
-                }else{
-                    this.pushOperation(value)
-                    this.setLastNumberToDisplay();
-                }
-        }else{
-             
-            if (this.isOperator(value)){
-                this.pushOperation(value)
-            }else{
-                let newValue = this.getLastOperation().toString() + value.toString()
-                this.setLastOperation(parseInt(newValue));
-
-                this.setLastNumberToDisplay();
-            }
-
-        }
-        
-        console.log(this._operation)
+    getLastOperation(){
+        return this._operation[this._operation.length - 1];
     }
-    calc(){
-        let last = this._operation.pop();
-        let result = eval(this._operation.join(''))
-
-        this._operation = [result,last];
-        this.setLastNumberToDisplay();
+    isOperator(value){
+       return  (['+','-','*','%','/'].indexOf(value) > -1);
     }
-
-    pushOperation(value){
-        this._operation.push(value);
-        if(this._operation.length > 3){
-            
-            this.calc();
-        }
-
+    
+    setLastOperation(value){
+        return this._operation[this._operation.length - 1] = value ;
     }
     
     setLastNumberToDisplay(){
         let lastNumber;
-        for (let i = this._operation.length-1; i >= 0; i--){
+        for(let i = this._operation.length -1 ; i >= 0; i--){
             if(!this.isOperator(this._operation[i])){
                 lastNumber = this._operation[i];
                 break;
             }
         }
+        if(!lastNumber) lastNumber = 0;
+        this.displayCalc = lastNumber
+    }
 
-        this.displayCalc = lastNumber;
+    calc(){
+        let last = ''
+
+        if(this._operation.length > 3){
+            last = this._operation.pop();
+        }
+
+        let result = eval(this._operation.join(''));
+
+        if(last == '%'){
+            result /=  100;
+            this._operation = [result];
+        }else{
+            this._operation = [result];
+
+            if(last){
+                this._operation.push(last)
+            }
+        }
+
+        
+        
+        this.setLastNumberToDisplay();
     }
-    setLastOperation(value){
-        this._operation[this._operation.length-1] = value;
+
+    pushOperation(value){
+        this._operation.push(value);
+        if(this._operation.length > 3){    
+            this.calc();
+        }
     }
-    isOperator(value){
-        return (['+','-','*','%','/'].indexOf(value) > -1);
-    }
-    getLastOperation(){
-        return this._operation[this._operation.length-1];
+
+    addOperation(value){
+
+        if(isNaN(this.getLastOperation())){
+
+            if(this.isOperator(value)){
+                this.setLastOperation(value);
+            }else if(isNaN(value)){
+                console.log('outra coisa',value)
+            }else{
+                this.pushOperation(value);
+                this.setLastNumberToDisplay();
+            }
+
+        }else{
+
+            if(this.isOperator(value)){
+                this.pushOperation(value);
+            }else{
+                let newValue = this.getLastOperation().toString() + value.toString();
+                this.setLastOperation(parseInt(newValue));
+                this.setLastNumberToDisplay();
+            }
+        }
     }
     
+    //limpa todo o array
     clearAll(){
         this._operation = [];
+        this.setLastNumberToDisplay();
     }
+    //Remove o ultimo index do array
     clearEntry(){
         this._operation.pop();
+        this.setLastNumberToDisplay();
     }
+    //seta mensagem de erro no display
     setError(){
         this.displayCalc = 'Error'
     }
  
+
     //------------- GET AND SETS ----------------
     get displayCalc(){
         return this._displayCalc.innerHTML;
